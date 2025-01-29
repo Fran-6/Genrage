@@ -21,7 +21,7 @@ def stream_data():
 # st.set_page_config(page_title="Genrage", layout="wide")
 # Set the page configuration
 st.set_page_config(
-    page_title="Genrage",  # Title on the browser tab
+    page_title="Genrage Streamlit",  # Title on the browser tab
     layout="wide",
     page_icon=":fr:",   # Use an emoji or a local image path
 )
