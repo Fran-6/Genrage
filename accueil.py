@@ -1,9 +1,9 @@
 import streamlit as st
-from utils.classifier import set_cuda, set_classifier, evaluation, allowed_characters
+from utils.classifier import set_classifier, evaluation, allowed_characters
 
 # Initialisations de paramètres
 EXEC = True
-device = set_cuda()
+# device = set_cuda()
 genres = ["féminin", "masculin"]
 rnn = set_classifier()
 # Initialisation des fonctions

@@ -14,14 +14,14 @@ candidats = ["ure", "érafe", "intère", "harise", "harisse", "mec", "mecton", "
 
 # fonctions
 
-def set_cuda():
-    # Check if CUDA is available
-    device = torch.device('cpu')
-    if torch.cuda.is_available():
-        device = torch.device('cuda')
+# def set_cuda():
+#     # Check if CUDA is available
+#     device = torch.device('cpu')
+#     if torch.cuda.is_available():
+#         device = torch.device('cuda')
 
-    torch.set_default_device(device)
-    return torch.get_default_device()
+#     torch.set_default_device(device)
+#     return torch.get_default_device()
 
 # %
 class CharRNN(nn.Module):
