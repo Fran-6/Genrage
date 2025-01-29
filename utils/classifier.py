@@ -61,7 +61,7 @@ def label_from_output(output, output_labels):
 
 
 def set_classifier():
-    set_cuda()
+    # set_cuda()
     rnn = CharRNN(n_letters, n_hidden, len(alldata_labels_uniq))
     rnn.load_state_dict(torch.load('./utils/rnn_model.pth', weights_only=True)) # charge les paramètres du modèle à partir du fichier.
     return rnn
