@@ -12,7 +12,7 @@ st.set_page_config(
 md= """
 ### Dit-on le ou la COVID ?
 
-#### L'usage des internautes d'après Google Trends:
+#### L'usage des internautes d'après Google Trends de février 2020 à janvier 2025:
 """
 # https://trends.google.fr/trends/explore?date=today%205-y&geo=FR&q=le%20covid,la%20covid&hl=fr/
 # Chemin vers le fichier HTML
@@ -61,8 +61,14 @@ css="""
         border-radius: 20px;
         border: 1px solid #ccc;       
         background: #FCFCEC;
-        color: #FFFFFF"
 
+    /* Dark Mode */
+    @media (prefers-color-scheme: dark) {
+
+        color: #ffffff;
+        background: #272400;
+
+    }
 
     }
 </style>
