@@ -12,12 +12,9 @@ st.set_page_config(
 md= """
 ### Dit-on le ou la COVID ?
 
-D'après Google Trends: https://trends.google.fr/trends/explore?date=today%205-y&geo=FR&q=le%20covid,la%20covid&hl=fr/
-
----
-
+#### L'usage des internautes d'après Google Trends:
 """
-
+# https://trends.google.fr/trends/explore?date=today%205-y&geo=FR&q=le%20covid,la%20covid&hl=fr/
 # Chemin vers le fichier HTML
 file_path = './pages/nepasdire.html'
 
@@ -28,6 +25,21 @@ with open(file_path, 'r', encoding='utf-8') as file:
 
 st.markdown(md)
 
+histo_covid = pd.read_csv('./data/multiTimeline.csv', sep=',', skiprows=2)
+histo_covid.columns = ['semaine', 'le', 'la']
+
+histo_covid['le'] = histo_covid['le'].apply(lambda x: '1' if x == '<\xa01' else x)
+histo_covid['la'] = histo_covid['la'].apply(lambda x: '1' if x == '<\xa01' else x)
+
+# Convert Column1 to datetime
+histo_covid['semaine'] = pd.to_datetime(histo_covid['semaine'])
+
+# Convert Column2 and Column3 to float
+histo_covid['le'] = histo_covid['le'].astype(float)
+histo_covid['la'] = histo_covid['la'].astype(float)
+
+st.line_chart(histo_covid, x="semaine", y=["le", "la"], color=["#00F","#F00"], x_label="")
+
 st.markdown(
     """<h3>Selon l'académie française</h3><a href="https://www.academie-francaise.fr/search/node/covid/">
     <img src="data:./images/logo.png;base64,{}" width="411">
@@ -36,6 +48,8 @@ st.markdown(
     ),
     unsafe_allow_html=True,
 )
+
+st.markdown("---")
 
 st.html(html_content)
 
@@ -47,6 +61,7 @@ css="""
         border-radius: 20px;
         border: 1px solid #ccc;       
         background: #FCFCEC;
+        color: #FFFFFF"
 
 
     }
@@ -54,11 +69,5 @@ css="""
 """
 st.write(css, unsafe_allow_html=True)
 
-histo_covid = pd.read_csv('./data/multiTimeline.csv', sep=',')
 
-st.write(histo_covid.columns)
-
-st.area_chart(histo_covid, x="date", y="count", color="series", stack="center")
-st.line_chart(histo_covid)
-
-st.sidebar.markdown("# Méthodologie :toolbox:")
+st.sidebar.markdown("# Covid 😷")
