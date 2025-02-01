@@ -103,7 +103,9 @@ def check_input_text(saisie):
     elif len(saisie) > 30 * 10:
         answer = f'### Nombre de caratères  saisis {len(saisie)} contre {30*10} maximum autorisés'
     elif nb_words > 10:
-        answer = f'### Trop de mots saisis {nb_words} contre 10 maximum autorisés)'
+        answer = f'### Trop de mots saisis "{nb_words}" contre 10 maximum autorisés)'
+    elif max_len > 30:  
+         answer = f'### Mot saisi "{max_word}" trop long, {max_len} caractères contre 30 maximum autorisés)'
     else:
         pass
     
