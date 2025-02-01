@@ -67,7 +67,7 @@ def set_classifier():
     return rnn
 
 def evaluation(lexeme, rnn):
-
+    lexeme = lexeme.lower()
     rnn.eval() #set to eval mode    
     classes=alldata_labels_uniq
     with torch.no_grad(): # do not record the gradients during eval phase
@@ -79,4 +79,35 @@ def evaluation(lexeme, rnn):
     sortie = np.exp(sortie)
 
     return guess_i, sortie[guess_i]
+
+def check_input_text(saisie):
+    saisie = saisie.lower()
+    s = set(saisie) - (set(allowed_characters) | set(";"))
+    lexemes = []
+    lexemes = saisie.split(";")
+    lexemes = [l.strip() for l in lexemes if l != ""]
+    nb_words = len(lexemes)
+    if not lexemes:
+        max_word = ""
+        max_len = 0
+    else:
+        max_word = max(lexemes, key=len)
+        max_len = len(max_word)
+
+    answer = None
+
+    if nb_words == 0 or saisie == "":
+        answer = '### Veuillez saisir un mot ou des mots séparés par ";" '
+    elif len(s)!=0:
+        answer = '### Caractère(s) non autorisé(s): ' + " ".join(sorted(s))
+    elif len(saisie) > 30 * 10:
+        answer = f'### Nombre de caratères  saisis {len(saisie)} contre {30*10} maximum autorisés'
+    elif nb_words > 10:
+        answer = f'### Trop de mots saisis {nb_words} contre 10 maximum autorisés)'
+    else:
+        pass
+    
+
+    return answer, lexemes
+    
 
