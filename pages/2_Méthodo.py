@@ -27,7 +27,7 @@ md= """
 - Entrainer le modèle et l'optimiser, puis tester le modèle
 - créer un modèle de génération de pseudo-mots, puis tester le modèle
 - Créer un appli Streamlit puis la publier 🌐
-- Un peu de Web scrapping pout imiter le style des sources
+- Un peu de Web scrapping pour imiter le style des sources
 - Enrichir avec une analyse de l'usage du genre du mot covid 😷
 - Enrichir avec une liste de mots générés selon plusieurs critères en entrée :construction:
 - Approche cartographique :construction:

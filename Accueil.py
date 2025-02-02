@@ -68,7 +68,7 @@ def stream_data():
 
         st.dataframe(
 
-            df.style.highlight_between(color= "#fee",left=49, right=60,axis=0,subset=["pourcent"]),
+            df.style.highlight_between(color= "#fff5f5",left=49, right=60,axis=0,subset=["pourcent"]),
 
             column_config={
                 "name": "Lexème",
@@ -84,19 +84,19 @@ def stream_data():
                     width=50,), 
                 "faux": st.column_config.CheckboxColumn(
                             "Erreur",
-                            help="Prédiction du réseau de neurones récurrent faussse relativement à la base de données le-DM",
+                            help="Prédiction du réseau de neurones récurrent fausse relativement à la base de données Le-DM",
                             ),              
                 "col_f": st.column_config.CheckboxColumn(
-                            "fem.",
-                            help="nom féminin présent dans la base de données le-DM",
+                            "Fem.",
+                            help="nom féminin présent dans la base de données Le-DM",
                             ),
                 "col_m": st.column_config.CheckboxColumn(
-                            "masc.",
-                            help="nom masculin présent dans la base de données le-DM",
+                            "Masc.",
+                            help="nom masculin présent dans la base de données Le-DM",
                             ),
                 "col_miss": st.column_config.CheckboxColumn(
                             "Manquant",
-                            help="nom présent dans la base de données le-DM",
+                            help="nom présent dans la base de données Le-DM",
                             ),                                                        
                 },hide_index=True,)
 
