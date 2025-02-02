@@ -73,7 +73,7 @@ def stream_data():
             column_config={
                 "name": st.column_config.TextColumn(
                     label="Lexème",
-                    help="D'après de réseau de neurones récurrent",
+
                     width=200,),
                 "genre": st.column_config.TextColumn(
                     label="Genre prédit",
