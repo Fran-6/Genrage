@@ -64,12 +64,12 @@ def stream_data():
             return f'color: {color}'
 
         
-        # theme = st_theme()
-        # st.write(theme)
+        theme = st_theme()
+        color_highlight = "#fff5f5" if theme["base"] != "dark" else "#500000"
 
         st.dataframe(
 
-            df.style.highlight_between(color= "#fff5f5",left=49, right=60,axis=0,subset=["pourcent"]),
+            df.style.highlight_between(color= color_highlight,left=49, right=60,axis=0,subset=["pourcent"]),
 
             column_config={
                 "name": st.column_config.TextColumn(
