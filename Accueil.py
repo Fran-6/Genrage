@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_theme import st_theme
 from utils.classifier import set_classifier, evaluation, check_input_text, allowed_characters
 from utils.autres import get_mots
 import pandas as pd
@@ -62,9 +63,9 @@ def stream_data():
             color = 'red' if val else 'green'
             return f'color: {color}'
 
-        # Apply styling to the 'Name' column based on 'Score'
-        styled_df = df.style.apply(lambda x: [color_text(v) for v in x['col_miss']], subset=['genre'])
-
+        
+        # theme = st_theme()
+        # st.write(theme)
 
         st.dataframe(
 
