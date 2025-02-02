@@ -1,12 +1,15 @@
 import streamlit as st
 from utils.classifier import set_classifier, evaluation, check_input_text, allowed_characters
+from utils.autres import get_mots
 import pandas as pd
+import numpy as np
 
 # Initialisations de paramètres
 EXEC = True
 # device = set_cuda()
 genres = ["féminin", "masculin"]
 rnn = set_classifier()
+mots_f, mots_m, mots_fm = get_mots()
 # Initialisation des fonctions
 def stream_data():
     answer, lexemes = check_input_text(lexeme)
@@ -24,38 +27,78 @@ def stream_data():
             genre = genres[idx]
             sortie = 'Le lexème "{}" est prédit comme {} à {:.1%}'.format(lex, genre, pourcentage)
             st.markdown(sortie)
-
     else:
         col_genre = []
         col_pourcent = []
+        col_f = []
+        col_m = []
+        col_faux = []
+        col_miss = []
         for lex in lexemes:
+            col_f.append(lex in mots_f)
+            col_m.append(lex in mots_m)
+            col_miss.append(lex not in set(mots_fm))
+                       
             idx, pourcentage = evaluation(lex, rnn)
             col_genre.append(genres[idx])
             col_pourcent.append(pourcentage*100)
+            col_faux.append((idx==0 and (lex not in mots_f)) or (idx==1 and (lex not in mots_m)) and lex in mots_fm)
+
         
         df = pd.DataFrame(
             {
                 "name": lexemes,
                 "genre": col_genre,
-                "pourcent": col_pourcent
+                "pourcent": col_pourcent,
+                "faux": col_faux,
+                "col_f": col_f,
+                "col_m": col_m,
+                "col_miss": col_miss
+
             }
         )
+        # Function to color text based on 'Score'
+        def color_text(val):
+            color = 'red' if val else 'green'
+            return f'color: {color}'
+
+        # Apply styling to the 'Name' column based on 'Score'
+        styled_df = df.style.apply(lambda x: [color_text(v) for v in x['col_miss']], subset=['genre'])
+
+
         st.dataframe(
-            df,
+
+            df.style.highlight_between(color= "#fee",left=49, right=60,axis=0,subset=["pourcent"]),
+
             column_config={
                 "name": "Lexème",
                 "genre": "Genre prédit",
+                "genre": st.column_config.TextColumn(
+                    label="Genre prédit",
+                    help="D'après de réseau de neurones récurrent",
+                    width=100,),
                 "pourcent": st.column_config.NumberColumn(
-                    label="%",
-                    help="Fiabilite selon le modele",
-                    format="%.1f",
-                    width=50,
-                    
-                ),
-
-            },hide_index=True,)
-
-
+                    label="  %",
+                    help="Confiance du modele",
+                    format="%0.1f",
+                    width=50,), 
+                "faux": st.column_config.CheckboxColumn(
+                            "Erreur",
+                            help="Prédiction du réseau de neurones récurrent faussse relativement à la base de données le-DM",
+                            ),              
+                "col_f": st.column_config.CheckboxColumn(
+                            "fem.",
+                            help="nom féminin présent dans la base de données le-DM",
+                            ),
+                "col_m": st.column_config.CheckboxColumn(
+                            "masc.",
+                            help="nom masculin présent dans la base de données le-DM",
+                            ),
+                "col_miss": st.column_config.CheckboxColumn(
+                            "Manquant",
+                            help="nom présent dans la base de données le-DM",
+                            ),                                                        
+                },hide_index=True,)
 
 
 # Configuration initiale
@@ -79,11 +122,11 @@ with st.container():
         # st.write("Entrez un nom à classer\n\n")
         lexeme = st.text_area(
             "Entrez les noms à classifier puis cliquez sur le bouton Genderize",
-            "covid ; anagramme ; ure ; Ket-Bra; quelqu'un ; noeud;a priori;guet-apens;curriculum vitae",
-            help="mots séparés par ';' en caractères alphabétiques + accents, tiret, cédille, espace et apostrophe",
-            max_chars=300)
+            "covid ; anagramme ; ure ; Ket-Bra; quelqu'un ; noeud;a priori;après-midi;curriculum vitae;stalactite",
+            help="mots séparés par ';' en caractères alphabétiques + accent, tiret, n tilde, cédille, tréma, espace et apostrophe",
+            max_chars=300,)
 
-        if st.button("Genderize") or EXEC:
+        if st.button("Genrage") or EXEC:
             stream_data()
 
         EXEC = False        

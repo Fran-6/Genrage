@@ -63,6 +63,7 @@ def label_from_output(output, output_labels):
 def set_classifier():
     # set_cuda()
     rnn = CharRNN(n_letters, n_hidden, len(alldata_labels_uniq))
+    import os
     rnn.load_state_dict(torch.load('./utils/rnn_model.pth', weights_only=True)) # charge les paramètres du modèle à partir du fichier.
     return rnn
 
@@ -81,11 +82,12 @@ def evaluation(lexeme, rnn):
     return guess_i, sortie[guess_i]
 
 def check_input_text(saisie):
-    saisie = saisie.lower()
+    saisie = saisie.lower().replace(chr(10), ";") # enlève les sauts de ligne
     s = set(saisie) - (set(allowed_characters) | set(";"))
     lexemes = []
     lexemes = saisie.split(";")
-    lexemes = [l.strip() for l in lexemes if l != ""]
+    lexemes = [l.strip() for l in lexemes if (l != "" and not l.isspace())]
+    # les chaînes vides ou faites d'espaces font planter le RNN
     nb_words = len(lexemes)
     if not lexemes:
         max_word = ""
