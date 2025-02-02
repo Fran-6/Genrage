@@ -71,8 +71,10 @@ def stream_data():
             df.style.highlight_between(color= "#fff5f5",left=49, right=60,axis=0,subset=["pourcent"]),
 
             column_config={
-                "name": "Lexème",
-                "genre": "Genre prédit",
+                "name": st.column_config.TextColumn(
+                    label="Lexème",
+                    help="D'après de réseau de neurones récurrent",
+                    width=200,),
                 "genre": st.column_config.TextColumn(
                     label="Genre prédit",
                     help="D'après de réseau de neurones récurrent",
@@ -98,7 +100,7 @@ def stream_data():
                             "Manquant",
                             help="nom présent dans la base de données Le-DM",
                             ),                                                        
-                },hide_index=True,)
+                },hide_index=True)
 
 
 # Configuration initiale
@@ -121,8 +123,8 @@ with st.container():
     with col2:
         # st.write("Entrez un nom à classer\n\n")
         lexeme = st.text_area(
-            "Entrez les noms à classifier puis cliquez sur le bouton Genderize",
-            "covid ; anagramme ; ure ; Ket-Bra; quelqu'un ; noeud;a priori;après-midi;curriculum vitae;stalactite",
+            "Entrez les noms à classifier puis cliquez sur le bouton Genrage",
+            "covid ; anagramme ; ure ; sot-l'y-laisse ; noeud;a priori;après-midi;stalactite",
             help="mots séparés par ';' en caractères alphabétiques + accent, tiret, n tilde, cédille, tréma, espace et apostrophe",
             max_chars=300,)
 
