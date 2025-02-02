@@ -1,9 +1,16 @@
 import streamlit as st
-from streamlit_theme import st_theme
+# from streamlit_theme import st_theme
 from utils.classifier import set_classifier, evaluation, check_input_text, allowed_characters
 from utils.autres import get_mots
 import pandas as pd
 import numpy as np
+
+# Set the page configuration
+st.set_page_config(
+    page_title="Genrage Streamlit",  # Title on the browser tab
+    layout="wide",
+    page_icon=":fr:",   # Use an emoji or a local image path
+)
 
 # Initialisations de paramètres
 EXEC = True
@@ -11,6 +18,7 @@ EXEC = True
 genres = ["féminin", "masculin"]
 rnn = set_classifier()
 mots_f, mots_m, mots_fm = get_mots()
+
 # Initialisation des fonctions
 def stream_data():
     answer, lexemes = check_input_text(lexeme)
@@ -46,72 +54,64 @@ def stream_data():
             col_faux.append((idx==0 and (lex not in mots_f)) or (idx==1 and (lex not in mots_m)) and lex in mots_fm)
 
         
-        df = pd.DataFrame(
-            {
-                "name": lexemes,
-                "genre": col_genre,
-                "pourcent": col_pourcent,
-                "faux": col_faux,
-                "col_f": col_f,
-                "col_m": col_m,
-                "col_miss": col_miss
+    df = pd.DataFrame(
+        {
+            "name": lexemes,
+            "genre": col_genre,
+            "pourcent": col_pourcent,
+            "faux": col_faux,
+            "col_f": col_f,
+            "col_m": col_m,
+            "col_miss": col_miss
 
-            }
-        )
-        # Function to color text based on 'Score'
-        def color_text(val):
-            color = 'red' if val else 'green'
-            return f'color: {color}'
+        }
+    )
 
-        
-        theme = st_theme()
-        color_highlight = "#fff5f5" if theme["base"] != "dark" else "#500000"
+    color_highlight = "#fff5f5"
+    # theme = st_theme()
+    # base = theme.get("base", "light")
+    # if base == "dark" :
+    #     color_highlight = "#fff5f5"
 
-        st.dataframe(
+    st.dataframe(
 
-            df.style.highlight_between(color= color_highlight,left=49, right=60,axis=0,subset=["pourcent"]),
+        df.style.highlight_between(color= color_highlight, left=49, right=60,axis=0,subset=["pourcent"]),
 
-            column_config={
-                "name": st.column_config.TextColumn(
-                    label="Lexème",
-
-                    width=200,),
-                "genre": st.column_config.TextColumn(
-                    label="Genre prédit",
-                    help="D'après de réseau de neurones récurrent",
-                    width=100,),
-                "pourcent": st.column_config.NumberColumn(
-                    label="  %",
-                    help="Confiance du modele",
-                    format="%0.1f",
-                    width=50,), 
-                "faux": st.column_config.CheckboxColumn(
-                            "Erreur",
-                            help="Prédiction du réseau de neurones récurrent fausse relativement à la base de données Le-DM",
-                            ),              
-                "col_f": st.column_config.CheckboxColumn(
-                            "Fem.",
-                            help="nom féminin présent dans la base de données Le-DM",
-                            ),
-                "col_m": st.column_config.CheckboxColumn(
-                            "Masc.",
-                            help="nom masculin présent dans la base de données Le-DM",
-                            ),
-                "col_miss": st.column_config.CheckboxColumn(
-                            "Manquant",
-                            help="nom présent dans la base de données Le-DM",
-                            ),                                                        
-                },hide_index=True)
+        column_config={
+            "name": st.column_config.TextColumn(
+                label="Lexème",
+                width=200,),
+            "genre": st.column_config.TextColumn(
+                label="Genre prédit",
+                help="D'après de réseau de neurones récurrent",
+                width=100,),
+            "pourcent": st.column_config.NumberColumn(
+                label="  %",
+                help="Confiance du modele",
+                format="%0.1f",
+                width=50,), 
+            "faux": st.column_config.CheckboxColumn(
+                        "Erreur",
+                        help="Prédiction du réseau de neurones récurrent fausse relativement à la base de données Le-DM",
+                        ),              
+            "col_f": st.column_config.CheckboxColumn(
+                        "Fem.",
+                        help="nom féminin présent dans la base de données Le-DM",
+                        ),
+            "col_m": st.column_config.CheckboxColumn(
+                        "Masc.",
+                        help="nom masculin présent dans la base de données Le-DM",
+                        ),
+            "col_miss": st.column_config.CheckboxColumn(
+                        "Manquant",
+                        help="nom présent dans la base de données Le-DM",
+                        ),                                                        
+            },hide_index=True)
 
 
 # Configuration initiale
 # st.set_page_config(page_title="Genrage", layout="wide")
-# Set the page configuration
-st.set_page_config(
-    page_title="Genrage Streamlit",  # Title on the browser tab
-    layout="wide",
-    page_icon=":fr:",   # Use an emoji or a local image path
-)
+
 st.markdown("""# Le genre des mots selon leur morphologie""")
 
 with st.container():
