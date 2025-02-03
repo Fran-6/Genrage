@@ -76,7 +76,7 @@ def stream_data():
 
     st.dataframe(
 
-        df.style.highlight_between(color= color_highlight, left=49, right=60,axis=0,subset=["pourcent"]),
+        df, #.style.highlight_between(color= color_highlight, left=49, right=60,axis=0,subset=["pourcent"]),
 
         column_config={
             "name": st.column_config.TextColumn(
@@ -127,7 +127,7 @@ with st.container():
         choix = st.radio(
             "Générateur de mots",
             [":rainbow[pseudo-mots]", "Liste prédéfinie", "Noms communs"],
-            captions=["générés par RNN","","",],)
+            captions=["générés par RNN","","Issus du dictionaire Le-Dm",],)
         # with st.container(border=True):
         #     fx = st.checkbox("féminins exclusifs ♀️", value=True, disabled=True, key="id_fx")
         #     epi = st.checkbox("mots des 2 genres ♀️∩♂️", value=True, disabled=True, key="id_epi")
@@ -139,7 +139,7 @@ with st.container():
         with st.container(border=True):
             left, middle, right = st.columns(3)
             a = left.checkbox("♀️", value=True, disabled=True, key="id_fx") #, help="féminins exclusifs")
-            middle.checkbox("♀️∩♂️", value=True, disabled=True, key="id_epi") #, help="mots des 2 genres")
+            middle.checkbox("🔗", value=True, disabled=True, key="id_epi") #, help="mots des 2 genres")
             right.checkbox("♂️", value=True, disabled=True, key="id_mx") #, help="masculins exclusifs")
 
         if a:
