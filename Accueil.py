@@ -18,6 +18,7 @@ EXEC = True
 genres = ["féminin", "masculin"]
 rnn = set_classifier()
 mots_f, mots_m, mots_fm = get_mots()
+liste_de_mots = ["covid","  anagramme ; ure ; sot-l'y-laisse ; noeud;a priori;après-midi;stalactite"]
 
 # Initialisation des fonctions
 def stream_data():
@@ -119,7 +120,41 @@ with st.container():
     col1, col2 = st.columns([1, 3])
     
     with col1:
-        pass
+
+        title = st.text_input("Mots commençant par:", "", max_chars=3)
+        st.write("The current movie title is", title)
+
+        choix = st.radio(
+            "Générateur de mots",
+            [":rainbow[pseudo-mots]", "Liste prédéfinie", "Noms communs"],
+            captions=["générés par RNN","","",],)
+        # with st.container(border=True):
+        #     fx = st.checkbox("féminins exclusifs ♀️", value=True, disabled=True, key="id_fx")
+        #     epi = st.checkbox("mots des 2 genres ♀️∩♂️", value=True, disabled=True, key="id_epi")
+        #     mx = st.checkbox("masculins exclusifs ♂️", value=True, disabled=True, key="id_mx")
+
+        # if fx:
+        #     st.write("Great!")
+
+        with st.container(border=True):
+            left, middle, right = st.columns(3)
+            a = left.checkbox("♀️", value=True, disabled=True, key="id_fx") #, help="féminins exclusifs")
+            middle.checkbox("♀️∩♂️", value=True, disabled=True, key="id_epi") #, help="mots des 2 genres")
+            right.checkbox("♂️", value=True, disabled=True, key="id_mx") #, help="masculins exclusifs")
+
+        if a:
+            st.write("a")
+
+        if choix == ":rainbow[Comedy]":
+            st.write("You selected comedy.")
+        else:
+            st.write("You didn't select comedy.")
+
+        number = st.number_input("Nombre de mots à générer", value=10, min_value=1, max_value=20, step=1)
+        st.write("The current number is ", number)
+
+        if st.button("Générer une liste de mots aléatoires"):
+            st.write(str(liste_de_mots))
 
     with col2:
         # st.write("Entrez un nom à classer\n\n")
