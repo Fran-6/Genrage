@@ -1,9 +1,14 @@
 import streamlit as st
 # from streamlit_theme import st_theme
 from utils.classifier import set_classifier, evaluation, check_input_text, allowed_characters
+from utils.generator import set_generator, generate
+from utils.generator import all_letters
 from utils.autres import get_mots
 import pandas as pd
 import numpy as np
+
+
+from streamlit import session_state as ss
 
 # Set the page configuration
 st.set_page_config(
@@ -17,12 +22,17 @@ EXEC = True
 # device = set_cuda()
 genres = ["féminin", "masculin"]
 rnn = set_classifier()
+gen_rnn = set_generator()
 mots_f, mots_m, mots_fm = get_mots()
+set_f, set_m, set_fm = set(mots_f), set(mots_m), set(mots_fm)
 liste_de_mots = ["covid","  anagramme ; ure ; sot-l'y-laisse ; noeud;a priori;après-midi;stalactite"]
 
+if "input_txt" not in ss: ss.input_txt = ""
+
 # Initialisation des fonctions
-def stream_data():
-    answer, lexemes = check_input_text(lexeme)
+def stream_data(lexeme):
+    
+    answer, lexemes =  check_input_text(lexeme) # ss.id_txt # lexeme 
     if answer is not None:
         st.markdown(answer)
         return answer
@@ -45,105 +55,100 @@ def stream_data():
         col_faux = []
         col_miss = []
         for lex in lexemes:
-            col_f.append(lex in mots_f)
-            col_m.append(lex in mots_m)
-            col_miss.append(lex not in set(mots_fm))
+            col_f.append(lex in set_f)
+            col_m.append(lex in set_m)
+            col_miss.append(lex not in set_fm)
                        
             idx, pourcentage = evaluation(lex, rnn)
             col_genre.append(genres[idx])
             col_pourcent.append(pourcentage*100)
-            col_faux.append((idx==0 and (lex not in mots_f)) or (idx==1 and (lex not in mots_m)) and lex in mots_fm)
+            col_faux.append((idx==0 and (lex not in set_f)) or (idx==1 and (lex not in set_m)) and lex in set_fm)
 
-        
-    df = pd.DataFrame(
-        {
-            "name": lexemes,
-            "genre": col_genre,
-            "pourcent": col_pourcent,
-            "faux": col_faux,
-            "col_f": col_f,
-            "col_m": col_m,
-            "col_miss": col_miss
+        df = pd.DataFrame(
+            {
+                "name": lexemes,
+                "genre": col_genre,
+                "pourcent": col_pourcent,
+                "faux": col_faux,
+                "col_f": col_f,
+                "col_m": col_m,
+                "col_miss": col_miss
 
-        }
-    )
+            }
+        )
 
-    color_highlight = "#fff5f5"
-    # theme = st_theme()
-    # base = theme.get("base", "light")
-    # if base == "dark" :
-    #     color_highlight = "#fff5f5"
+        st.dataframe(
 
-    st.dataframe(
+            df,
+            column_config={
+                "name": st.column_config.TextColumn(
+                    label="Lexème",
+                    width=200,),
+                "genre": st.column_config.TextColumn(
+                    label="Genre prédit",
+                    help="D'après de réseau de neurones récurrent",
+                    width=100,),
+                "pourcent": st.column_config.NumberColumn(
+                    label="  %",
+                    help="Confiance du modele",
+                    format="%0.1f",
+                    width=50,), 
+                "faux": st.column_config.CheckboxColumn(
+                            "Erreur",
+                            help="Prédiction du réseau de neurones récurrent fausse relativement à la base de données Le-DM",
+                            ),              
+                "col_f": st.column_config.CheckboxColumn(
+                            "Fem.",
+                            help="nom féminin présent dans la base de données Le-DM",
+                            ),
+                "col_m": st.column_config.CheckboxColumn(
+                            "Masc.",
+                            help="nom masculin présent dans la base de données Le-DM",
+                            ),
+                "col_miss": st.column_config.CheckboxColumn(
+                            "Manquant",
+                            help="nom présent dans la base de données Le-DM",
+                            ),                                                        
+                },hide_index=True, key="id_df")
 
-        df, #.style.highlight_between(color= color_highlight, left=49, right=60,axis=0,subset=["pourcent"]),
+def stream_gen():
+    #
+    m = number
+    mots = []
+    while m > 0 :
+        mot = generate(gen_rnn,'fs', txt if txt else "a")
+        mots.append(mot)
+        inputs = " ; ".join(mots)
+        m -= 1
+    ss.input_txt = inputs
 
-        column_config={
-            "name": st.column_config.TextColumn(
-                label="Lexème",
-                width=200,),
-            "genre": st.column_config.TextColumn(
-                label="Genre prédit",
-                help="D'après de réseau de neurones récurrent",
-                width=100,),
-            "pourcent": st.column_config.NumberColumn(
-                label="  %",
-                help="Confiance du modele",
-                format="%0.1f",
-                width=50,), 
-            "faux": st.column_config.CheckboxColumn(
-                        "Erreur",
-                        help="Prédiction du réseau de neurones récurrent fausse relativement à la base de données Le-DM",
-                        ),              
-            "col_f": st.column_config.CheckboxColumn(
-                        "Fem.",
-                        help="nom féminin présent dans la base de données Le-DM",
-                        ),
-            "col_m": st.column_config.CheckboxColumn(
-                        "Masc.",
-                        help="nom masculin présent dans la base de données Le-DM",
-                        ),
-            "col_miss": st.column_config.CheckboxColumn(
-                        "Manquant",
-                        help="nom présent dans la base de données Le-DM",
-                        ),                                                        
-            },hide_index=True)
-
-
-# Configuration initiale
-# st.set_page_config(page_title="Genrage", layout="wide")
-
+    
 st.markdown("""# Le genre des mots selon leur morphologie""")
 
 with st.container():
     # Créer des colonnes à l'intérieur du conteneur
     col1, col2 = st.columns([1, 3])
-    
+
+
+
     with col1:
 
-        title = st.text_input("Mots commençant par:", "", max_chars=3)
-        st.write("The current movie title is", title)
+        txt = st.text_input("Mots commençant par:", "", max_chars=3)
+        st.write("The current movie title is", txt)
 
         choix = st.radio(
             "Générateur de mots",
             [":rainbow[pseudo-mots]", "Liste prédéfinie", "Noms communs"],
             captions=["générés par RNN","","Issus du dictionaire Le-Dm",],)
-        # with st.container(border=True):
-        #     fx = st.checkbox("féminins exclusifs ♀️", value=True, disabled=True, key="id_fx")
-        #     epi = st.checkbox("mots des 2 genres ♀️∩♂️", value=True, disabled=True, key="id_epi")
-        #     mx = st.checkbox("masculins exclusifs ♂️", value=True, disabled=True, key="id_mx")
-
-        # if fx:
-        #     st.write("Great!")
 
         with st.container(border=True):
             left, middle, right = st.columns(3)
-            a = left.checkbox("♀️", value=True, disabled=True, key="id_fx") #, help="féminins exclusifs")
-            middle.checkbox("🔗", value=True, disabled=True, key="id_epi") #, help="mots des 2 genres")
-            right.checkbox("♂️", value=True, disabled=True, key="id_mx") #, help="masculins exclusifs")
+            fx = left.checkbox("♀️", value=True, disabled=False, key="id_fx") #, help="féminins exclusifs")
+            epi = middle.checkbox("🔗", value=True, disabled=False, key="id_epi") #, help="mots des 2 genres")
+            mx = right.checkbox("♂️", value=True, disabled=False, key="id_mx") #, help="masculins exclusifs")
 
-        if a:
-            st.write("a")
+        if fx:
+            st.write("fx")
 
         if choix == ":rainbow[Comedy]":
             st.write("You selected comedy.")
@@ -153,21 +158,46 @@ with st.container():
         number = st.number_input("Nombre de mots à générer", value=10, min_value=1, max_value=20, step=1)
         st.write("The current number is ", number)
 
-        if st.button("Générer une liste de mots aléatoires"):
-            st.write(str(liste_de_mots))
 
     with col2:
-        # st.write("Entrez un nom à classer\n\n")
-        lexeme = st.text_area(
-            "Entrez les noms à classifier puis cliquez sur le bouton Genrage",
-            "covid ; anagramme ; ure ; sot-l'y-laisse ; noeud;a priori;après-midi;stalactite",
-            help="mots séparés par ';' en caractères alphabétiques + accent, tiret, n tilde, cédille, tréma, espace et apostrophe",
-            max_chars=300,)
+        # st.write("Entrez un nom à classer")
+        ss.lexeme = st.text_area(
+            label="Entrez les mots puis cliquez sur le bouton Genrage ou 'CTRL+Entrée'",
+            value=ss.input_txt,
+            help="mots séparés par ';' en caractères alphabétiques + accent, tiret, n tilde, cédille, tréma, espace et apostrophe)",
+            max_chars=300, key="id_txt",
+            placeholder="Entrez un mot ou des mots à classifier séparés par des ';' (caractères autorisés: alphabétiques + accent, tiret, n tilde, cédille, tréma, espace et apostrophe"            )
 
-        if st.button("Genrage") or EXEC:
-            stream_data()
+        # st.write(st.session_state["id_txt"])
+        # st.markdown("```\n"+ lexeme + "\n```")
+        # st.write(st.session_state["id_txt"]==lexeme)
+        if st.button("Générer une liste de mots aléatoires"):
+            stream_gen()
 
-        EXEC = False        
+        if st.button("Genrage"):
+            st.write(ss.lexeme)
+            stream_data(ss.lexeme)
+
+        EXEC = False  
+
+        
+
+        # if "txt_sample" not in ss: ss.txt_sample = "This is my sample text which I can add to, if required..."
+        # if "wgt_contents" not in ss: ss.wgt_contents = ""
+
+#         def btncb():
+#             ss.wgt_contents = ss.txt_sample
+
+#         ss.wgt_contents_ = st.text_area("My Text", value=ss.wgt_contents, height=200, placeholder="Enter text...")
+#         sc1, sc2, sc3 = st.columns((2,2,5))
+#         sc1.button('Load Sample', key='btn-load-sample', on_click=btncb)
+#         if sc2.button('Show Raw Text_', key='btn-raw-txt_'):
+#             st.write(f"Show Raw text-: {ss.wgt_contents_}")
+#         if sc3.button('Show Raw Text', key='btn-raw-txt'):
+#             st.write(f"Show Raw text: {ss.wgt_contents}")
+
+# if st.button("session state"):
+#     st.write(st.session_state)
 
 st.sidebar.markdown("# Accueil :house:")
 # st.sidebar.markdown("# sources :eyes:")
