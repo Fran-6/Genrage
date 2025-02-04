@@ -25,13 +25,13 @@ rnn = set_classifier()
 gen_rnn = set_generator()
 mots_f, mots_m, mots_fm = get_mots()
 set_f, set_m, set_fm = set(mots_f), set(mots_m), set(mots_fm)
-liste_de_mots = ["covid","  anagramme ; ure ; sot-l'y-laisse ; noeud;a priori;après-midi;stalactite"]
+liste_de_mots = ["covid","  anagramme","ure","sot-l'y-laisse", "noeud", "a priori", "après-midi", "stalactite"]
 
-if "input_txt" not in ss: ss.input_txt = ""
+if "input_txt" not in ss: ss.input_txt = "covid ; anagramme ; ure ; sot-l'y-laisse ; noeud ; a priori ; après-midi ; stalactite"
 
 # Initialisation des fonctions
-def stream_data(lexeme):
-    
+def stream_data():
+    lexeme = ss.lexeme
     answer, lexemes =  check_input_text(lexeme) # ss.id_txt # lexeme 
     if answer is not None:
         st.markdown(answer)
@@ -121,13 +121,15 @@ def stream_gen():
         inputs = " ; ".join(mots)
         m -= 1
     ss.input_txt = inputs
-
+   
+def reset_input():
+    ss.input_txt = ""
     
 st.markdown("""# Le genre des mots selon leur morphologie""")
 
 with st.container():
     # Créer des colonnes à l'intérieur du conteneur
-    col1, col2 = st.columns([1, 3])
+    col2, col1 = st.columns([3, 1])
 
 
 
@@ -156,8 +158,6 @@ with st.container():
             st.write("You didn't select comedy.")
 
         number = st.number_input("Nombre de mots à générer", value=10, min_value=1, max_value=20, step=1)
-        st.write("The current number is ", number)
-
 
     with col2:
         # st.write("Entrez un nom à classer")
@@ -168,19 +168,19 @@ with st.container():
             max_chars=300, key="id_txt",
             placeholder="Entrez un mot ou des mots à classifier séparés par des ';' (caractères autorisés: alphabétiques + accent, tiret, n tilde, cédille, tréma, espace et apostrophe"            )
 
-        # st.write(st.session_state["id_txt"])
-        # st.markdown("```\n"+ lexeme + "\n```")
-        # st.write(st.session_state["id_txt"]==lexeme)
-        if st.button("Générer une liste de mots aléatoires"):
-            stream_gen()
+        sc1, sc2, sc3 = st.columns((3,1,5))
 
-        if st.button("Genrage"):
-            st.write(ss.lexeme)
-            stream_data(ss.lexeme)
+        sc1.button("Générer une liste de mots aléatoires", on_click=stream_gen) 
+        # if sc3.button("Reset"):
+        #     reset_input()
+        if sc2.button("Genrage") or EXEC:
+            stream_data()
+            EXEC = False
 
-        EXEC = False  
-
-        
+        sc3.button("Reset", on_click=reset_input)
+        # sc2.button("Genrage", on_click=stream_data)
+                  
+       
 
         # if "txt_sample" not in ss: ss.txt_sample = "This is my sample text which I can add to, if required..."
         # if "wgt_contents" not in ss: ss.wgt_contents = ""
