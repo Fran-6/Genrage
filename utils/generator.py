@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import string
+import streamlit as st
 
 # paramètres:
 all_letters = string.ascii_letters + " .,;'-"
@@ -49,6 +50,7 @@ def inputTensor(line):
         tensor[li][0][all_letters.find(letter)] = 1
     return tensor
 
+@st.cache_resource
 def set_generator():
     # set_cuda()
     rnn = RNN(n_letters, 128, n_letters)

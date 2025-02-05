@@ -6,6 +6,7 @@ from utils.generator import all_letters
 from utils.autres import get_mots
 import pandas as pd
 import numpy as np
+import random
 
 
 from streamlit import session_state as ss
@@ -19,17 +20,39 @@ st.set_page_config(
 
 # Initialisations de paramètres
 EXEC = True
-# device = set_cuda()
-genres = ["féminin", "masculin"]
-rnn = set_classifier()
-gen_rnn = set_generator()
-mots_f, mots_m, mots_fm = get_mots()
-set_f, set_m, set_fm = set(mots_f), set(mots_m), set(mots_fm)
-liste_de_mots = ["covid","  anagramme","ure","sot-l'y-laisse", "noeud", "a priori", "après-midi", "stalactite"]
 
+
+genres = ["féminin", "masculin"]
+mots_f, mots_m, mots_epi, mots_fx, mots_mx, mots_fm = get_mots()
+
+set_f, set_m, set_fm = set(mots_f), set(mots_m), set(mots_epi)
+
+liste_de_mots = ["covid","anagramme","ure","sot-l'y-laisse", "noeud",
+                "a priori", "après-midi", "stalactite", "xylite"]
 if "input_txt" not in ss: ss.input_txt = "covid ; anagramme ; ure ; sot-l'y-laisse ; noeud ; a priori ; après-midi ; stalactite"
 
+listes_dict = {
+    # fx, epi, mx
+    (True, True, True): mots_fm,
+    (True, True, False): mots_f,
+    (True, False, True): mots_fx.extend(mots_mx),
+    (True, False, False): mots_fx,
+    (False, True, True): mots_m,
+    (False, True, False): mots_epi,
+    (False, False, True): mots_mx,
+    (False, False, False): [],
+}
+
+rnn = set_classifier()
+gen_rnn = set_generator()
+
+
 # Initialisation des fonctions
+
+
+
+
+
 def stream_data():
     lexeme = ss.lexeme
     answer, lexemes =  check_input_text(lexeme) # ss.id_txt # lexeme 
@@ -62,7 +85,7 @@ def stream_data():
             idx, pourcentage = evaluation(lex, rnn)
             col_genre.append(genres[idx])
             col_pourcent.append(pourcentage*100)
-            col_faux.append((idx==0 and (lex not in set_f)) or (idx==1 and (lex not in set_m)) and lex in set_fm)
+            col_faux.append(((idx==0 and (lex not in set_f)) or (idx==1 and (lex not in set_m))) and lex in set_fm)
 
         df = pd.DataFrame(
             {
@@ -113,13 +136,33 @@ def stream_data():
 
 def stream_gen():
     #
-    m = number
+    n = number # d
+    # choix ":rainbow[pseudo-mots]", "Liste prédéfinie", "Noms communs"
+    # fx ,epi, mx de checkbox
     mots = []
-    while m > 0 :
-        mot = generate(gen_rnn,'fs', txt if txt else "a")
-        mots.append(mot)
-        inputs = " ; ".join(mots)
-        m -= 1
+    limit = 100
+    if choix == ":rainbow[pseudo-mots]":
+        while n > 0 and limit > 0:
+            mot = generate(gen_rnn,'fs', txt if txt else "a")
+            if mot not in mots:
+                mots.append(mot)
+                inputs = " ; ".join(mots)
+                n -= 1
+            limit -= 1
+    elif choix == "Liste prédéfinie":
+        inputs = random.sample(liste_de_mots, min(len(liste_de_mots), number))
+        inputs = " ; ".join(inputs)
+    elif choix == "Noms communs":
+        liste_choisie = listes_dict[(fx, epi, mx)]
+        
+        if txt != "":
+            prefix = txt
+            # Filtrer les mots dont les deux premiers caractères sont le préfixe donné
+            liste_choisie = [m for m in liste_choisie if m.startswith(prefix)]
+
+        inputs = random.sample(liste_choisie, min(len(liste_choisie), number))
+        inputs = " ; ".join(inputs)
+
     ss.input_txt = inputs
    
 def reset_input():
@@ -149,13 +192,6 @@ with st.container():
             epi = middle.checkbox("🔗", value=True, disabled=False, key="id_epi") #, help="mots des 2 genres")
             mx = right.checkbox("♂️", value=True, disabled=False, key="id_mx") #, help="masculins exclusifs")
 
-        if fx:
-            st.write("fx")
-
-        if choix == ":rainbow[Comedy]":
-            st.write("You selected comedy.")
-        else:
-            st.write("You didn't select comedy.")
 
         number = st.number_input("Nombre de mots à générer", value=10, min_value=1, max_value=20, step=1)
 
@@ -168,15 +204,15 @@ with st.container():
             max_chars=300, key="id_txt",
             placeholder="Entrez un mot ou des mots à classifier séparés par des ';' (caractères autorisés: alphabétiques + accent, tiret, n tilde, cédille, tréma, espace et apostrophe"            )
 
-        sc1, sc2, sc3 = st.columns((3,1,5))
+        sc1, sc2, sc3 = st.columns((2,1,5))
 
         sc1.button("Générer une liste de mots aléatoires", on_click=stream_gen) 
         # if sc3.button("Reset"):
         #     reset_input()
-        if sc2.button("Genrage") or EXEC:
+        if sc2.button("Genrage"):
             stream_data()
-            EXEC = False
-
+            
+            
         sc3.button("Reset", on_click=reset_input)
         # sc2.button("Genrage", on_click=stream_data)
                   
@@ -184,20 +220,6 @@ with st.container():
 
         # if "txt_sample" not in ss: ss.txt_sample = "This is my sample text which I can add to, if required..."
         # if "wgt_contents" not in ss: ss.wgt_contents = ""
-
-#         def btncb():
-#             ss.wgt_contents = ss.txt_sample
-
-#         ss.wgt_contents_ = st.text_area("My Text", value=ss.wgt_contents, height=200, placeholder="Enter text...")
-#         sc1, sc2, sc3 = st.columns((2,2,5))
-#         sc1.button('Load Sample', key='btn-load-sample', on_click=btncb)
-#         if sc2.button('Show Raw Text_', key='btn-raw-txt_'):
-#             st.write(f"Show Raw text-: {ss.wgt_contents_}")
-#         if sc3.button('Show Raw Text', key='btn-raw-txt'):
-#             st.write(f"Show Raw text: {ss.wgt_contents}")
-
-# if st.button("session state"):
-#     st.write(st.session_state)
 
 st.sidebar.markdown("# Accueil :house:")
 # st.sidebar.markdown("# sources :eyes:")

@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import streamlit as st
 
 
 # paramètres:
@@ -59,7 +60,7 @@ def label_from_output(output, output_labels):
     label_i = top_i[0].item()
     return output_labels[label_i], label_i
 
-
+@st.cache_resource
 def set_classifier():
     # set_cuda()
     rnn = CharRNN(n_letters, n_hidden, len(alldata_labels_uniq))
@@ -89,6 +90,7 @@ def check_input_text(saisie):
     lexemes = [l.strip() for l in lexemes if (l != "" and not l.isspace())]
     # les chaînes vides ou faites d'espaces font planter le RNN
     nb_words = len(lexemes)
+    nb_limite_de_mots = 20
     if not lexemes:
         max_word = ""
         max_len = 0
@@ -104,8 +106,8 @@ def check_input_text(saisie):
         answer = '### Caractère(s) non autorisé(s): ' + " ".join(sorted(s))
     elif len(saisie) > 30 * 10:
         answer = f'### Nombre de caratères  saisis {len(saisie)} contre {30*10} maximum autorisés'
-    elif nb_words > 15:
-        answer = f'### Trop de mots saisis "{nb_words}" contre 15 maximum autorisés)'
+    elif nb_words > nb_limite_de_mots:
+        answer = f'### Trop de mots saisis "{nb_words}" contre {nb_limite_de_mots} maximum autorisés)'
     elif max_len > 30:  
          answer = f'### Mot saisi "{max_word}" trop long, {max_len} caractères contre 30 maximum autorisés)'
     else:
