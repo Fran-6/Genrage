@@ -101,7 +101,7 @@ def check_input_text(saisie):
     answer = None
 
     if nb_words == 0 or saisie == "":
-        answer = '### Veuillez saisir un mot ou des mots séparés par ";" '
+        answer = '### Veuillez saisir un mot ou des mots séparés par ":red[;]" '
     elif len(s)!=0:
         answer = '### Caractère(s) non autorisé(s): ' + " ".join(sorted(s))
     elif len(saisie) > 30 * 10:

@@ -15,11 +15,19 @@ md= """
 #### Points clé:
 
 - Linguistique
+  - Nooj
+  - HuggingFace
 
 - webscrapping
 
-  - Nooj
-  - HuggingFace
+- data science
+
+- deep learning
+
+- code
+  - The .extend() method modifies the original list in place. It does not create a new list. 😖
+
+
 - Choix d'une base de données gratuite open source
   - Dictionnaire de l’Académie française de 1932-35 (8e édition) > Non adapté (J'enrage!) ❌
   - Lexique Le-Dm > ✔️

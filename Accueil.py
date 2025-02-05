@@ -25,12 +25,12 @@ EXEC = True
 genres = ["féminin", "masculin"]
 mots_f, mots_m, mots_epi, mots_fx, mots_mx, mots_fm = get_mots()
 
-set_f, set_m, set_fm = set(mots_f), set(mots_m), set(mots_epi)
+set_f, set_m, set_fm = set(mots_f), set(mots_m), set(mots_fm)
 
 liste_de_mots = ["covid","anagramme","ure","sot-l'y-laisse", "noeud",
                 "a priori", "après-midi", "stalactite", "xylite"]
 if "input_txt" not in ss: ss.input_txt = "covid ; anagramme ; ure ; sot-l'y-laisse ; noeud ; a priori ; après-midi ; stalactite"
-
+if "col_genres_rnn" not in ss: ss.col_genres_rnn = []
 listes_dict = {
     # fx, epi, mx
     (True, True, True): mots_fm,
@@ -42,16 +42,22 @@ listes_dict = {
     (False, False, True): mots_mx,
     (False, False, False): [],
 }
+liste_genres_dict = {
+    # fx, epi, mx
+    (True, True, True): ['fs', 'ms'],
+    (True, True, False): ['fs', 'ms'],
+    (True, False, True): ['fs', 'ms'],
+    (True, False, False): ['fs'],
+    (False, True, True): ['fs', 'ms'],
+    (False, True, False): ['fs', 'ms'],
+    (False, False, True): ['ms'],
+    (False, False, False): ['fs', 'ms'],  
+}
 
 rnn = set_classifier()
 gen_rnn = set_generator()
 
-
 # Initialisation des fonctions
-
-
-
-
 
 def stream_data():
     lexeme = ss.lexeme
@@ -140,18 +146,32 @@ def stream_gen():
     # choix ":rainbow[pseudo-mots]", "Liste prédéfinie", "Noms communs"
     # fx ,epi, mx de checkbox
     mots = []
+    genres_rnn = []
     limit = 100
     if choix == ":rainbow[pseudo-mots]":
+        # if txt != "":
+        #     debut = txt
+        # else:
+        #     debut = str(random.sample(mots_fm,1)[0])[0]
+        
         while n > 0 and limit > 0:
-            mot = generate(gen_rnn,'fs', txt if txt else "a")
+
+            debut = str(random.sample(mots_fm,1)[0]) if txt == "" else txt
+
+            g = random.sample(liste_genres_dict[(fx, epi, mx)], 1)
+            g = "".join(g)
+            print("catégorie :", g)     
+            mot = generate(gen_rnn, 'ms' ,start_letter= debut if debut else "a")
             if mot not in mots:
                 mots.append(mot)
                 inputs = " ; ".join(mots)
+                genres_rnn.append(g[0])
                 n -= 1
             limit -= 1
     elif choix == "Liste prédéfinie":
         inputs = random.sample(liste_de_mots, min(len(liste_de_mots), number))
         inputs = " ; ".join(inputs)
+        genres_rnn = [""]*len(inputs)
     elif choix == "Noms communs":
         liste_choisie = listes_dict[(fx, epi, mx)]
         
@@ -165,19 +185,19 @@ def stream_gen():
         else:
             inputs = random.sample(liste_choisie, min(len(liste_choisie), number),)
             inputs = " ; ".join(inputs)
-
+        genres_rnn = [""]*len(inputs)
+    
+    ss.col_genres_rnn = genres_rnn
     ss.input_txt = inputs
    
 def reset_input():
     ss.input_txt = ""
     
-st.markdown("""# Le genre des mots selon leur morphologie""")
+st.markdown("""## Le genre des mots selon leur morphologie""")
 
-with st.container():
+with st.container(height=None):
     # Créer des colonnes à l'intérieur du conteneur
-    col2, col1 = st.columns([3, 1])
-
-
+    col2, col1 = st.columns([3, 1], border=True)
 
     with col1:
 
@@ -209,20 +229,15 @@ with st.container():
 
         sc1, sc2, sc3 = st.columns((2,1,5))
 
-        sc1.button("Générer une liste de mots aléatoires", on_click=stream_gen) 
+        sc1.button("Liste de mots aléatoires", on_click=stream_gen) 
         # if sc3.button("Reset"):
         #     reset_input()
-        if sc2.button("Genrage"):
-            stream_data()
-            
+        if sc2.button("Genrage") or EXEC:
+            EXEC = False
+            stream_data()      
             
         sc3.button("Reset", on_click=reset_input)
-        # sc2.button("Genrage", on_click=stream_data)
-                  
-       
 
-        # if "txt_sample" not in ss: ss.txt_sample = "This is my sample text which I can add to, if required..."
-        # if "wgt_contents" not in ss: ss.wgt_contents = ""
 
 st.sidebar.markdown("# Accueil :house:")
 # st.sidebar.markdown("# sources :eyes:")
