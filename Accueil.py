@@ -35,7 +35,7 @@ listes_dict = {
     # fx, epi, mx
     (True, True, True): mots_fm,
     (True, True, False): mots_f,
-    (True, False, True): mots_fx.extend(mots_mx),
+    (True, False, True): mots_fx + mots_mx,
     (True, False, False): mots_fx,
     (False, True, True): mots_m,
     (False, True, False): mots_epi,
@@ -160,8 +160,11 @@ def stream_gen():
             # Filtrer les mots dont les deux premiers caractères sont le préfixe donné
             liste_choisie = [m for m in liste_choisie if m.startswith(prefix)]
 
-        inputs = random.sample(liste_choisie, min(len(liste_choisie), number))
-        inputs = " ; ".join(inputs)
+        if liste_choisie == []:
+            inputs = ""
+        else:
+            inputs = random.sample(liste_choisie, min(len(liste_choisie), number),)
+            inputs = " ; ".join(inputs)
 
     ss.input_txt = inputs
    
