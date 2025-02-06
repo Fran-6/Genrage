@@ -6,6 +6,7 @@ import streamlit as st
 
 # paramètres:
 all_letters = string.ascii_letters + " .,;'-"
+all_letters = "abcdefghijklmnopqrstuvwxyz '-àâçèéêëîïñôöûü"
 n_letters = len(all_letters) + 1 # Plus EOS marker
 
 n_categories, all_categories = 2, ['ms', 'fs']

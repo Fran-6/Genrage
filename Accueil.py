@@ -30,7 +30,7 @@ set_f, set_m, set_fm = set(mots_f), set(mots_m), set(mots_fm)
 liste_de_mots = ["covid","anagramme","ure","sot-l'y-laisse", "noeud",
                 "a priori", "après-midi", "stalactite", "xylite",
                 "adénofibromerien", "imprévisibilitière", "télé-détectioneuse", "caille-laiton",
-                "xateure-teuterre", "descendancerie"]
+                "xateure-teuterre", "descendancerie", "coupé-colléonore", "herophyme","zoriche"]
 if "input_txt" not in ss: ss.input_txt = "covid ; anagramme ; ure ; sot-l'y-laisse ; noeud ; a priori ; après-midi ; stalactite"
 if "col_genres_rnn" not in ss: ss.col_genres_rnn = ["-"]*len(ss.input_txt.split(";")) 
 if "rnn_txt" not in ss: ss.rnn_txt = ""
@@ -103,7 +103,6 @@ def stream_data():
         else:
             col_rnn = ["-"]*len(lexemes)
             
-        print("longueurs dans data rnn vs lexemes", len(col_rnn), "=?", len(lexemes))
 
         df = pd.DataFrame(
             {
@@ -149,38 +148,39 @@ def stream_data():
                             ),
                 "col_miss": st.column_config.CheckboxColumn(
                             "Manquant",
-                            help="nom présent dans la base de données Le-DM",
+                            help="nom ansent de la base de données Le-DM",
                             ),
                 "col_rnn": st.column_config.TextColumn(
                     label="RNN",
-                    help="Genre des pseudo-mots créés par le réseau de neurones récurrent",
+                    help="Genre théorique des pseudo-mots créés par le réseau de neurones récurrent",
                     width=100),
                 },hide_index=True, key="id_df")
 
 def stream_gen():
     #
-    n = number # d
+    n = 0 # d
     # choix ":rainbow[pseudo-mots]", "Liste prédéfinie", "Noms communs"
     # fx ,epi, mx de checkbox
     mots = []
     genres_rnn = []
-    limit = 100
+    limit = 0
     if choix == ":rainbow[pseudo-mots]":
         
-        while n > 0 and limit > 0:
+        while n < number and limit < 100:
 
             debut = str(random.sample(mots_fm,1)[0]) if txt == "" else txt
 
             g = random.sample(liste_genres_dict[(fx, epi, mx)], 1)
             g = "".join(g)
-            print("catégorie :", g)     
+    
             mot = generate(gen_rnn, 'ms' ,start_letter= debut if debut else "a")
             if mot not in mots:
                 mots.append(mot)
                 inputs = " ; ".join(mots)
                 genres_rnn.append("féminin" if g=="fs" else "masculin" if g=="ms" else "?")
-                n -= 1
-            limit -= 1
+                n += 1
+            limit += 1
+        print(f"Le générateur à fait {limit} essais pour créer {n} mots différents")
         ss.rnn_txt = inputs
 
     elif choix == "Liste prédéfinie":
