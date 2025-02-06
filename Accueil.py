@@ -28,9 +28,12 @@ mots_f, mots_m, mots_epi, mots_fx, mots_mx, mots_fm = get_mots()
 set_f, set_m, set_fm = set(mots_f), set(mots_m), set(mots_fm)
 
 liste_de_mots = ["covid","anagramme","ure","sot-l'y-laisse", "noeud",
-                "a priori", "après-midi", "stalactite", "xylite"]
+                "a priori", "après-midi", "stalactite", "xylite",
+                "adénofibromerien", "imprévisibilitière", "télé-détectioneuse", "caille-laiton",
+                "xateure-teuterre", "descendancerie"]
 if "input_txt" not in ss: ss.input_txt = "covid ; anagramme ; ure ; sot-l'y-laisse ; noeud ; a priori ; après-midi ; stalactite"
-if "col_genres_rnn" not in ss: ss.col_genres_rnn = []
+if "col_genres_rnn" not in ss: ss.col_genres_rnn = ["-"]*len(ss.input_txt.split(";")) 
+if "rnn_txt" not in ss: ss.rnn_txt = ""
 listes_dict = {
     # fx, epi, mx
     (True, True, True): mots_fm,
@@ -83,6 +86,7 @@ def stream_data():
         col_m = []
         col_faux = []
         col_miss = []
+        col_rnn = []
         for lex in lexemes:
             col_f.append(lex in set_f)
             col_m.append(lex in set_m)
@@ -93,6 +97,14 @@ def stream_data():
             col_pourcent.append(pourcentage*100)
             col_faux.append(((idx==0 and (lex not in set_f)) or (idx==1 and (lex not in set_m))) and lex in set_fm)
 
+        if ss.lexeme == ss.rnn_txt:
+            col_rnn = ss.col_genres_rnn
+            col_faux = [ r!=g for r, g in zip(col_rnn, col_genre)]
+        else:
+            col_rnn = ["-"]*len(lexemes)
+            
+        print("longueurs dans data rnn vs lexemes", len(col_rnn), "=?", len(lexemes))
+
         df = pd.DataFrame(
             {
                 "name": lexemes,
@@ -101,7 +113,8 @@ def stream_data():
                 "faux": col_faux,
                 "col_f": col_f,
                 "col_m": col_m,
-                "col_miss": col_miss
+                "col_miss": col_miss,
+                "col_rnn": col_rnn,
 
             }
         )
@@ -137,7 +150,11 @@ def stream_data():
                 "col_miss": st.column_config.CheckboxColumn(
                             "Manquant",
                             help="nom présent dans la base de données Le-DM",
-                            ),                                                        
+                            ),
+                "col_rnn": st.column_config.TextColumn(
+                    label="RNN",
+                    help="Genre des pseudo-mots créés par le réseau de neurones récurrent",
+                    width=100),
                 },hide_index=True, key="id_df")
 
 def stream_gen():
@@ -149,10 +166,6 @@ def stream_gen():
     genres_rnn = []
     limit = 100
     if choix == ":rainbow[pseudo-mots]":
-        # if txt != "":
-        #     debut = txt
-        # else:
-        #     debut = str(random.sample(mots_fm,1)[0])[0]
         
         while n > 0 and limit > 0:
 
@@ -165,13 +178,16 @@ def stream_gen():
             if mot not in mots:
                 mots.append(mot)
                 inputs = " ; ".join(mots)
-                genres_rnn.append(g[0])
+                genres_rnn.append("féminin" if g=="fs" else "masculin" if g=="ms" else "?")
                 n -= 1
             limit -= 1
+        ss.rnn_txt = inputs
+
     elif choix == "Liste prédéfinie":
         inputs = random.sample(liste_de_mots, min(len(liste_de_mots), number))
         inputs = " ; ".join(inputs)
-        genres_rnn = [""]*len(inputs)
+        genres_rnn = ["-"]*len(inputs.split(";"))
+
     elif choix == "Noms communs":
         liste_choisie = listes_dict[(fx, epi, mx)]
         
@@ -185,7 +201,7 @@ def stream_gen():
         else:
             inputs = random.sample(liste_choisie, min(len(liste_choisie), number),)
             inputs = " ; ".join(inputs)
-        genres_rnn = [""]*len(inputs)
+        
     
     ss.col_genres_rnn = genres_rnn
     ss.input_txt = inputs
@@ -211,9 +227,9 @@ with st.container(height=None):
 
         with st.container(border=True):
             left, middle, right = st.columns(3)
-            fx = left.checkbox("♀️", value=True, disabled=False, key="id_fx") #, help="féminins exclusifs")
-            epi = middle.checkbox("🔗", value=True, disabled=False, key="id_epi") #, help="mots des 2 genres")
-            mx = right.checkbox("♂️", value=True, disabled=False, key="id_mx") #, help="masculins exclusifs")
+            fx = left.checkbox("♀️", value=True, disabled=False, key="id_fx",help="Mots féminins") #, help="féminins exclusifs")
+            epi = middle.checkbox("🔗", value=True, disabled=False, key="id_epi", help="Mots des deux genres") #, help="mots des 2 genres")
+            mx = right.checkbox("♂️", value=True, disabled=False, key="id_mx", help="Mots masculins") #, help="masculins exclusifs")
 
 
         number = st.number_input("Nombre de mots à générer", value=10, min_value=1, max_value=20, step=1)

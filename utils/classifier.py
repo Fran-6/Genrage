@@ -104,7 +104,7 @@ def check_input_text(saisie):
         answer = '### Veuillez saisir un mot ou des mots séparés par ":red[;]" '
     elif len(s)!=0:
         answer = '### Caractère(s) non autorisé(s): ' + " ".join(sorted(s))
-    elif len(saisie) > 30 * 10:
+    elif len(saisie) > 30 * 20:
         answer = f'### Nombre de caratères  saisis {len(saisie)} contre {30*10} maximum autorisés'
     elif nb_words > nb_limite_de_mots:
         answer = f'### Trop de mots saisis "{nb_words}" contre {nb_limite_de_mots} maximum autorisés)'
