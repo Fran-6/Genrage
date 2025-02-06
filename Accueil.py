@@ -136,19 +136,19 @@ def stream_data():
                     width=50,), 
                 "faux": st.column_config.CheckboxColumn(
                             "Erreur",
-                            help="Prédiction du réseau de neurones récurrent fausse relativement à la base de données Le-DM",
+                            help="Prédiction du réseau de neurones récurrent fausse",
                             ),              
                 "col_f": st.column_config.CheckboxColumn(
                             "Fem.",
-                            help="nom féminin présent dans la base de données Le-DM",
+                            help="Nom féminin présent dans la base de données Le-DM",
                             ),
                 "col_m": st.column_config.CheckboxColumn(
                             "Masc.",
-                            help="nom masculin présent dans la base de données Le-DM",
+                            help="Nom masculin présent dans la base de données Le-DM",
                             ),
                 "col_miss": st.column_config.CheckboxColumn(
                             "Manquant",
-                            help="nom ansent de la base de données Le-DM",
+                            help="Nom ansent de la base de données Le-DM",
                             ),
                 "col_rnn": st.column_config.TextColumn(
                     label="RNN",
