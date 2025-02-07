@@ -29,8 +29,7 @@ md= """
 - Créer un appli Streamlit puis la publier 🌐
 - Un peu de Web scrapping pour imiter le style des sources
 - Enrichir avec une analyse de l'usage du genre du mot covid 😷
-- Enrichir avec une liste de mots générés selon plusieurs critères en entrée :construction:
-- Approche cartographique :construction:
+- Enrichir avec une liste de mots générés selon plusieurs critères en entrée
 """
 
 st.markdown(md)
