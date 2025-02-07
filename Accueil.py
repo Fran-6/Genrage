@@ -148,7 +148,7 @@ def stream_data():
                             ),
                 "col_miss": st.column_config.CheckboxColumn(
                             "Manquant",
-                            help="Nom ansent de la base de données Le-DM",
+                            help="Nom absent de la base de données Le-DM",
                             ),
                 "col_rnn": st.column_config.TextColumn(
                     label="RNN",
