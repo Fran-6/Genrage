@@ -43,6 +43,8 @@ st.link_button("Académie Française", "https://www.dictionnaire-academie.fr/", 
 
 st.link_button("Wiktionnaire", "https://fr.wiktionary.org/wiki/covid", icon="👍",)
 
+st.link_button("Ortholang", "https://www.ortolang.fr/en/home/", icon="😋")
+
 # st.image('https://fr.wiktionary.org/static/images/icons/wiktionary.svg',)
 
 
