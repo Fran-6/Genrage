@@ -173,7 +173,7 @@ def stream_gen():
             g = random.sample(liste_genres_dict[(fx, epi, mx)], 1)
             g = "".join(g)
     
-            mot = generate(gen_rnn, 'ms' ,start_letter= debut if debut else "a")
+            mot = generate(gen_rnn, g ,start_letter= debut if debut else "a")
             if mot not in mots:
                 mots.append(mot)
                 inputs = " ; ".join(mots)
