@@ -31,7 +31,7 @@ liste_de_mots = ["covid","anagramme","ure","sot-l'y-laisse", "noeud",
                 "a priori", "après-midi", "stalactite", "xylite",
                 "adénofibromerien", "imprévisibilitière", "télé-détectioneuse", "caille-laiton",
                 "xateure-teuterre", "descendancerie", "coupé-colléonore", "herophyme","zoriche"]
-if "input_txt" not in ss: ss.input_txt = "covid ; anagramme ; ure ; sot-l'y-laisse ; noeud ; a priori ; après-midi ; stalagtite"
+if "input_txt" not in ss: ss.input_txt = "covid ; anagramme ; ure ; sot-l'y-laisse ; noeud ; a priori ; après-midi ; stalagmite"
 if "col_genres_rnn" not in ss: ss.col_genres_rnn = ["-"]*len(ss.input_txt.split(";")) 
 if "rnn_txt" not in ss: ss.rnn_txt = ""
 listes_dict = {
