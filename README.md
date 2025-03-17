@@ -6,7 +6,7 @@ based on material preparation and neural network training on NLP_Genrage reposit
 
 ---
 
-deployed on streamlit.io
+deployed on streamlit.io [here](https://genrage-fvdjgshaftx5isphvmqswn.streamlit.app/)
 
 
 <!-- <img src="./images/Capture-Streamlit_App.png" alt="Genrage on streamlit.io" 
